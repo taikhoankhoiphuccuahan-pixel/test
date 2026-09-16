@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sử Việt Toàn Thư - Bản Đồ Lịch Sử Tương Tác</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        dark: '#070a13', // Deep slate velvet black
+                        surface: '#111827', // Rich charcoal card surface
+                        primary: '#EAB308', // Radiant Gold for Royal Vibe
+                        accent: '#F97316', // Fiery Orange for battles/milestones
+                        goldDark: '#854D0E',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #070a13;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #EAB308;
+        }
+
+        .bg-canvas {
+            background-color: #070a13;
+            background-image: 
+                radial-gradient(rgba(234, 179, 8, 0.07) 1px, transparent 1px),
+                radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 32px 32px;
+            background-position: 0 0, 16px 16px;
+        }
+
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, #EAB308 0%, #F97316 50%, transparent 100%);
+            z-index: 0;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-dark text-slate-300 font-sans h-screen overflow-hidden flex flex-col md:flex-row selection:bg-primary selection:text-dark">
+
+    <!-- Sidebar: Major Eras -->
+    <aside class="w-full md:w-80 glass-panel border-b md:border-b-0 md:border-r border-slate-800 flex flex-col h-1/3 md:h-full z-20 shrink-0">
+        <div class="p-5 border-b border-slate-800/80 flex flex-col gap-1">
+            <h1 class="text-2xl font-serif text-white font-bold flex items-center gap-2.5">
+                <i class="ph ph-crown text-primary text-3xl drop-shadow-[0_0_10px_rgba(234,179,8,0.4)]"></i>
+                Sử Việt Toàn Thư
+            </h1>
+            <p class="text-xs text-slate-500 uppercase tracking-widest font-semibold mt-1">Đại Toàn Bản Đồ Lịch Sử</p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="p-4 border-b border-slate-800/60 bg-dark/40">
+            <div class="relative">
+                <i class="ph ph-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-lg"></i>
+                <input type="text" id="search-input" placeholder="Tìm mốc lịch sử, vĩ nhân..." 
+                       class="w-full pl-9 pr-4 py-2 bg-slate-900/90 text-sm text-slate-200 border border-slate-800 rounded-xl focus:outline-none focus:border-primary/60 focus:ring-1 focus:ring-primary/30 transition-all placeholder-slate-500"
+                       oninput="handleSearch()">
+            </div>
+        </div>
+
+        <nav id="sidebar-nav" class="flex-1 overflow-y-auto p-4 space-y-2.5">
+            <!-- Rendered via JS -->
+        </nav>
+
+        <div class="hidden md:block p-4 border-t border-slate-800 text-xs text-slate-500 text-center bg-slate-950/40">
+            <span class="font-serif italic">"Dân ta phải biết sử ta"</span>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col h-2/3 md:h-full relative bg-canvas overflow-hidden">
+        
+        <!-- Header & Tabs -->
+        <header class="glass-panel border-b border-slate-800/80 z-10 shrink-0 shadow-lg shadow-black/30">
+            <div class="px-6 py-4 md:px-8 md:pt-6 md:pb-3 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h2 id="page-title" class="text-2xl md:text-3xl font-serif text-white mb-1.5 flex items-center gap-3">Đang tải...</h2>
+                    <p id="page-desc" class="text-slate-400 text-xs md:text-sm max-w-4xl leading-relaxed">...</p>
+                </div>
+                <!-- Mini Stats Badge -->
+                <div class="hidden lg:flex items-center gap-4 bg-slate-900/60 border border-slate-800 rounded-xl p-3 text-xs">
+                    <div class="flex items-center gap-2 text-primary">
+                        <i class="ph ph-scroll text-lg"></i>
+                        <div>
+                            <p class="text-slate-500 uppercase font-bold text-[10px]">Triều đại/Mốc</p>
+                            <p class="font-bold font-serif text-slate-200" id="stat-tabs-count">0</p>
+                        </div>
+                    </div>
+                    <div class="w-px h-8 bg-slate-800"></div>
+                    <div class="flex items-center gap-2 text-accent">
+                        <i class="ph ph-shield-star text-lg"></i>
+                        <div>
+                            <p class="text-slate-500 uppercase font-bold text-[10px]">Tổng sự kiện</p>
+                            <p class="font-bold font-serif text-slate-200" id="stat-events-count">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tabs (Years/Sub-periods) -->
+            <div class="px-6 md:px-8">
+                <div id="tabs-container" class="flex gap-4 md:gap-6 overflow-x-auto no-scrollbar pb-3 pt-2">
+                    <!-- Rendered via JS -->
+                </div>
+            </div>
+        </header>
+
+        <!-- Canvas Board (Interactive Content) -->
+        <div id="canvas-board" class="flex-1 overflow-y-auto p-6 md:p-8 relative">
+            <!-- Timeline Nodes Rendered via JS -->
+        </div>
+
+    </main>
+
+    <!-- Custom Modal for event detail -->
+    <div id="detail-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="glass-panel w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl border border-slate-700/50 flex flex-col max-h-[90vh]">
+            <div class="p-6 border-b border-slate-800 flex justify-between items-start bg-slate-900/50">
+                <div>
+                    <span id="modal-date" class="inline-block px-3 py-1 bg-primary/20 text-primary text-xs font-bold rounded-lg mb-2"></span>
+                    <h3 id="modal-title" class="text-2xl font-serif text-white"></h3>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-800 transition-all">
+                    <i class="ph ph-x text-2xl"></i>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto text-slate-300 leading-relaxed text-base space-y-4" id="modal-desc">
+                <!-- Rich details -->
+            </div>
+            <div class="p-4 border-t border-slate-800 bg-slate-900/30 flex justify-end gap-3 shrink-0">
+                <button id="modal-tts-btn" class="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-sm font-semibold transition-all">
+                    <i class="ph ph-speaker-high text-lg text-primary"></i> Đọc Bản Tin Sử
+                </button>
+                <button onclick="closeModal()" class="px-4 py-2 bg-primary hover:bg-yellow-500 text-dark rounded-xl text-sm font-bold transition-all">
+                    Đóng lại
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATABASE: Đại Toàn Thư Lịch Sử Việt Nam ---
+        const historyData = [
+            {
+                id: 'era-1',
+                title: 'Hồng Bàng & Bắc Thuộc',
+                desc: 'Từ thuở hoang sơ mở cõi với nhà nước Văn Lang - Âu Lạc sơ khai, đến một thiên niên kỷ rực lửa khởi nghĩa chống phong kiến phương Bắc để đòi quyền tự chủ dân tộc.',
+                icon: 'ph-mountains',
+                tabs: [
+                    {
+                        year: '2879 TCN - 258 TCN',
+                        name: 'Thời Kỳ Hồng Bàng',
+                        overview: 'Nhà nước Văn Lang rực rỡ buổi bình minh lập nước gắn với triều đại 18 đời vua Hùng, phát triển đỉnh cao Văn hóa Đông Sơn độc đáo.',
+                        events: [
+                            { 
+                                date: 'Khoảng 2879 TCN', 
+                                title: 'Kinh Dương Vương Lập Nước Xích Quỷ', 
+                                desc: 'Nguồn gốc thiêng liêng khai thủy của tộc người Bách Việt gắn liền truyền thuyết Con Rồng Cháu Tiên (Lạc Long Quân và Âu Cơ), mở đầu thời đại mở mang bờ cõi dã sử của tộc người Việt.' 
+                            },
+                            { 
+                                date: 'Thế kỷ VII TCN', 
+                                title: 'Nhà Nước Văn Lang Ra Đời', 
+                                desc: 'Hùng Vương đầu tiên lên ngôi, thiết lập hệ thống quan lại Lạc Hầu, Lạc Tướng sơ khởi. Đóng đô tại Phong Châu (Phú Thọ hiện nay), định hình văn hóa lúa nước bền bỉ.' 
+                            },
+                            { 
+                                date: 'Thế kỷ V TCN - II SCN', 
+                                title: 'Văn Hóa Đông Sơn & Trống Đồng', 
+                                desc: 'Phát triển cực thịnh kỹ nghệ đúc đồng cổ đại. Trống đồng Đông Sơn trở thành đỉnh cao nghệ thuật sáng tạo, biểu trưng uy quyền thủ lĩnh và kết tinh văn hóa tâm linh thiêng liêng.' 
+                            }
+                        ]
+                    },
+                    {
+                        year: '258 TCN - 179 TCN',
+                        name: 'Nhà Nước Âu Lạc',
+                        overview: 'Thời kỳ Thục Phán An Dương Vương lập quốc, dời đô xuống đồng bằng, đổi mới quốc phòng vượt bậc trước các họa xâm lăng phương Bắc.',
+                        events: [
+                            { 
+                                date: '258 TCN', 
+                                title: 'Thành Lập Nhà Nước Âu Lạc', 
+                                desc: 'Thục Phán đánh bại thế lực Hùng Vương suy yếu, thống nhất hai đại tộc người Tây Âu và Lạc Việt, tự xưng An Dương Vương lập nên quốc hiệu Âu Lạc vĩ đại.' 
+                            },
+                            { 
+                                date: 'Khoảng 210 TCN', 
+                                title: 'Xây Thành Cổ Loa & Nỏ Liên Châu', 
+                                desc: 'Xây dựng Loa Thành tại Cổ Loa (Đông Anh, Hà Nội ngày nay). Thiết kế thành trì cấu trúc hình xoáy ốc kiên cố độc đáo cùng việc chế tạo thành công nỏ thần liên châu bắn ra hàng trăm mũi tên một lúc của Cao Lỗ.' 
+                            },
+                            { 
+                                date: '179 TCN', 
+                                title: 'Triệu Đà Thôn Tính Âu Lạc', 
+                                desc: 'Lợi dụng mưu kế gián điệp lấy cắp bí mật quân sự thông qua mối tình Trọng Thủy - Mỵ Châu, quân Nam Việt của Triệu Đà bất ngờ tấn công tiêu diệt Âu Lạc. Đất nước bắt đầu rơi vào ngàn năm u tối.' 
+                            }
+                        ]
+                    },
+                    {
+                        year: '179 TCN - 938',
+                        name: 'Nghìn Năm Kháng Bắc Thuộc',
+                        overview: 'Hơn một thiên niên kỷ bị áp bức đô hộ hà khắc của phương Bắc, song ý chí quật cường bền bỉ nhen nhóm ngọn lửa khởi nghĩa liên hoàn cứu nước.',
+                        events: [
+                            { 
+                                date: 'Tháng 3 năm 40', 
+                                title: 'Khởi Nghĩa Hai Bà Trưng', 
+                                desc: 'Hai chị em Trưng Trắc - Trưng Nhị phất cờ khởi nghĩa tại Hát Môn (Hà Nội). Đánh đuổi Thái thú Tô Định tàn bạo, giải phóng 65 huyện thành. Trưng Trắc lên ngôi vua, đóng đô ở Mê Linh.' 
+                            },
+                            { 
+                                date: 'Năm 248', 
+                                title: 'Bà Triệu Khởi Nghĩa Ở Thanh Hóa', 
+                                desc: 'Triệu Thị Trinh dấy binh khởi nghĩa chống nhà Ngô. Câu nói anh dũng lưu danh muôn thuở: "Tôi muốn cưỡi cơn gió mạnh, đạp luồng sóng dữ, chém cá kình ở biển Đông, giành lại giang sơn..."' 
+                            },
+                            { 
+                                date: '542 - 602', 
+                                title: 'Khởi Nghĩa Lý Bí - Nước Vạn Xuân', 
+                                desc: 'Lý Bí đánh tan quân đô hộ nhà Lương, giải phóng bờ cõi. Năm 544 lên ngôi hoàng đế (Lý Nam Đế), thành lập nhà nước Vạn Xuân tự chủ, đặt niên hiệu là Thiên Đức. Triệu Quang Phục nối ngôi chống cự dũng mãnh tại đầm Dạ Trạch.' 
+                            },
+                            { 
+                                date: '905', 
+                                title: 'Khúc Thừa Dụ Giành Quyền Tự Chủ', 
+                                desc: 'Lợi dụng nhà Đường suy sụp, hào trưởng Khúc Thừa Dụ đánh chiếm phủ Tống Bình (Hà Nội), xưng làm Tiết độ sứ, khôi phục nền tự chủ thực tế cho người Việt.' 
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'era-2',
+                title: 'Kỷ nguyên Đại Việt',
+                desc: 'Thời kỳ hoàng kim chói lọi của nền độc lập phong kiến. Thời gian quốc hiệu Đại Việt xưng vương, khai phá văn hóa, dời đô Thăng Long và chiến thắng oanh liệt trước những đế quốc sừng sỏ nhất địa cầu.',
+                icon: 'ph-sword',
+                tabs: [
+                    {
+                        year: '938 - 1009',
+                        name: 'Ngô - Đinh - Tiền Lê',
+                        overview: 'Nền độc lập phong kiến chính thức được mở ra, dập tắt hoàn toàn mộng xâm lấn của phương Bắc, thống nhất giang sơn loạn lạc.',
+                        events: [
+                            { 
+                                date: '938', 
+                                title: 'Chiến Thắng Bạch Đằng Vĩ Đại', 
+                                desc: 'Ngô Quyền sử dụng trận địa cọc ngầm mưu trí đánh bại hoàn toàn đạo quân Nam Hán hung hãn trên cửa sông Bạch Đằng. Kết thúc vĩnh viễn hơn 1000 năm Bắc thuộc tối tăm, mở ra kỷ nguyên độc lập lâu dài cho Tổ quốc.' 
+                            },
+                            { 
+                                date: '968', 
+                                title: 'Đinh Tiên Hoàng Dẹp Loạn 12 Sứ Quân', 
+                                desc: 'Đinh Bộ Lĩnh hoàn thành sứ mệnh dẹp loạn 12 sứ quân, thống nhất bờ cõi giang sơn. Ông lên ngôi Hoàng đế (Đinh Tiên Hoàng), đặt quốc hiệu Đại Cồ Việt, dọn đô về Hoa Lư.' 
+                            },
+                            { 
+                                date: '981', 
+                                title: 'Lê Hoàn Phá Quân Tống Xâm Lược', 
+                                desc: 'Trước nguy cơ nhà Tống sang xâm lược lần 1, Lê Hoàn được tôn làm vua (Lê Đại Hành). Ông lập phòng tuyến chỉ huy đánh tan đại quân Tống xâm lược trên sông Bạch Đằng và Chi Lăng.' 
+                            }
+                        ]
+                    },
+                    {
+                        year: '1009 - 1225',
+                        name: 'Triều Đại Nhà Lý',
+                        overview: 'Triều đại khai mở sự phồn thịnh Thăng Long, phát triển rực rỡ đạo Phật, xây dựng hệ thống khoa học giáo dục quốc gia quy củ.',
+                        events: [
+                            { 
+                                date: '1010', 
+                                title: 'Lý Thái Tổ Ban Chiếu Dời Đô', 
+                                desc: 'Lý Công Uẩn lên ngôi hoàng đế, ban sắc lệnh "Chiếu dời đô" lịch sử, di chuyển vương cung từ Hoa Lư chật hẹp về thành Đại La bằng phẳng phì nhiêu, đổi tên thành Thăng Long (Rồng Bay).' 
+                            },
+                            { 
+                                date: '1070 - 1076', 
+                                title: 'Xây Dựng Văn Miếu & Quốc Tử Giám', 
+                                desc: 'Nhà Lý cho lập Văn Miếu thờ Khổng Tử và Quốc Tử Giám vào năm 1076 - Trường Đại học quốc gia đầu tiên tại Việt Nam, đặt bệ phóng đào tạo hiền tài cho quốc gia.' 
+                            },
+                            { 
+                                date: '1075 - 1077', 
+                                title: 'Phòng Tuyến Như Nguyệt - Thơ Thần', 
+                                desc: 'Thái úy Lý Thường Kiệt chủ trương "tiên phát chế nhân", dấy quân vây Ung Châu (Tống) rồi lập phòng tuyến vững chắc bên sông Như Nguyệt tiêu diệt 10 vạn quân Quách Quỳ. Tác phẩm bài thơ thần "Nam quốc sơn hà" vang vọng hào khí cứu quốc.' 
+                            }
+                        ]
+                    },
+                    {
+                        year: '1225 - 1427',
+                        name: 'Nhà Trần - Hồ & Kháng Minh',
+                        overview: 'Triều đại vinh quang 3 lần đại bại vó ngựa Nguyên Mông tàn bạo, cùng thời kỳ biến động chuyển giao đau thương mất nước vào tay giặc Minh.',
+                        events: [
+                            { 
+                                date: '1226', 
+                                title: 'Nhà Trần Thiết Lập Vương Triều', 
+                                desc: 'Chuyển giao vương quyền ôn hòa độc đáo từ nhà Lý sang nhà Trần qua cuộc hôn nhân giữa Nữ hoàng Lý Chiêu Hoàng và Trần Cảnh (vua Trần Thái Tông).' 
+                            },
+                            { 
+                                date: '1258 - 1288', 
+                                title: 'Ba Lần Kháng Nguyên Mông Đại Thắng', 
+                                desc: 'Quân dân Trần Triều với sự gắn kết ý chí đồng lòng tại Hội nghị Diên Hồng và tài thao lược thiên tài của Quốc công Tiết chế Trần Hưng Đạo đã liên tục đập tan 3 đợt xâm lăng cực lớn từ đế chế Nguyên Mông vô địch thế giới thời bấy giờ.' 
+                            },
+                            { 
+                                date: '1400 - 1407', 
+                                title: 'Nhà Hồ Thay Thế & Mất Nước Vào Tay Minh', 
+                                desc: 'Hồ Quý Ly truất ngôi nhà Trần, lập nước Đại Ngu với nhiều chính sách cải cách vĩ mô lỗi lạc như phát hành tiền giấy đầu tiên, dời đô về Tây Đô (Thanh Hóa). Tuy nhiên, vì lòng dân ly tán, đất nước nhanh chóng thất thủ rơi vào tay quân nhà Minh tàn khốc.' 
+                            }
+                        ]
+                    },
+                    {
+                        year: '1428 - 1527',
+                        name: 'Nhà Lê Sơ Thịnh Trị',
+                        overview: 'Hào khí Lam Sơn quét sạch giặc Minh bạo tàn, mở ra nền lập pháp vĩ đại và một thời kỳ phát triển văn hiến cực thịnh bậc nhất của quốc gia.',
+                        events: [
+                            { 
+                                date: '1418 - 1427', 
+                                title: 'Khởi Nghĩa Lam Sơn Thắng Lợi', 
+                                desc: 'Bình Định Vương Lê Lợi dấy binh khởi nghĩa tại Lam Sơn (Thanh Hóa). Trải qua 10 năm gian khổ ròng rã, đại thắng oanh liệt tại Chi Lăng - Xương Giang buộc quân Minh dâng sớ xin hàng rút quân.' 
+                            },
+                            { 
+                                date: '1428', 
+                                title: 'Nguyễn Trãi Soạn Bình Ngô Đại Cáo', 
+                                desc: 'Lê Lợi lên ngôi vua (Lê Thái Tổ), định đô Thăng Long. Trọng thần Nguyễn Trãi soạn "Bình Ngô Đại Cáo" - áng thiên cổ hùng văn bất hủ, bản Tuyên ngôn Độc lập hào hùng thứ 2 của dân tộc Việt.' 
+                            },
+                            { 
+                                date: '1460 - 1497', 
+                                title: 'Minh Quân Lê Thánh Tông & Luật Hồng Đức', 
+                                desc: 'Trị vì hoàng kim rực rỡ nhất lịch sử phong kiến. Hoàng đế Lê Thánh Tông ban hành bộ luật "Quốc triều hình luật" (Luật Hồng Đức) tiến bộ chứa đựng giá trị bảo vệ phụ nữ và toàn vẹn biên cương đất nước; xác lập bản đồ địa lý Hồng Đức.' 
+                            }
+                        ]
+                    },
+                    {
+                        year: '1527 - 1788',
+                        name: 'Thời Phân Tranh & Nam Tiến',
+                        overview: 'Triều chính suy thoái nảy sinh nội chiến kéo dài. Trịnh - Nguyễn phân tranh cắt đôi sơn hà, song bờ cõi bờ cõi Nam tiến không ngừng được mở mang.',
+                        events: [
+                            { 
+                                date: '1527', 
+                                title: 'Mạc Đăng Dung Lập Nhà Mạc', 
+                                desc: 'Mạc Đăng Dung phế truất vua Lê Chiêu Tông bất tài, tự lập triều Mạc (Bắc triều). Cựu thần Nguyễn Kim nổi binh dấy lên phong trào phù Lê (Nam triều), đẩy đất nước vào thời kỳ Nam - Bắc triều nội chiến điêu linh.' 
+                            },
+                            { 
+                                date: '1558', 
+                                title: 'Nguyễn Hoàng Vào Trấn Thủ Thuận Hóa', 
+                                desc: 'Tránh mưu hại của nhạc phụ Trịnh Kiểm, Chúa Nguyễn Hoàng (Chúa Tiên) đi vào vùng đất Thuận - Quảng hoang vu để khai hoang mở đất, đặt nền móng kiến thiết xứ Đàng Trong vững chãi gối đầu mở rộng phương Nam.' 
+                            },
+                            { 
+                                date: '1627 - 1672', 
+                                title: 'Chiến Tranh Trịnh - Nguyễn Bùng Nổ', 
+                                desc: 'Nội chiến tàn khốc chia rẽ đất nước thành Đàng Ngoài (vua Lê chúa Trịnh) và Đàng Trong (Chúa Nguyễn) trong 45 năm xung đột, dùng sông Gianh làm ranh giới ước định chia cắt bờ cõi.' 
+                            },
+                            { 
+                                date: '1698', 
+                                title: 'Nguyễn Hữu Cảnh Thành Lập Phủ Gia Định', 
+                                desc: 'Lễ Thành Hầu Nguyễn Hữu Cảnh vâng lệnh Chúa Nguyễn tiến hành đi tuần thú kinh lý phía Nam, thiết lập toàn diện bộ máy hành chính phủ Gia Định. Xác lập chủ quyền tuyệt đối của Đại Việt trên lưu vực đất đai Nam Bộ phong phú trù phú.' 
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'era-3',
+                title: 'Tây Sơn & Nhà Nguyễn',
+                desc: 'Từ bão táp nông dân Tây Sơn quét sạch tập đoàn phong kiến lỗi thời và thế lực ngoại bang xâm lăng, đến triều đại thống nhất cương vực vĩ mô cuối cùng của triều Nguyễn trước thềm xâm lược Pháp thuộc.',
+                icon: 'ph-fire',
+                tabs: [
+                    {
+                        year: '1771 - 1802',
+                        name: 'Triều Đại Tây Sơn',
+                        overview: 'Phong trào nông dân Tây Sơn quật khởi đánh sập các tập đoàn thống trị hư mục Đàng Trong - Đàng Ngoài, thống lĩnh cứu quốc oai hùng.',
+                        events: [
+                            { 
+                                date: '1785', 
+                                title: 'Trận Rạch Gầm - Xoài Mút', 
+                                desc: 'Long Nhượng Tướng Quân Nguyễn Huệ điều binh phục kích đại phá hoàn toàn 5 vạn quân Xiêm La (Thái Lan) trên sông Mỹ Tho, thể hiện tài nghệ quân sự thủy chiến đỉnh cao cứu quốc ở miền Nam.' 
+                            },
+                            { 
+                                date: 'Tết Kỷ Dậu 1789', 
+                                title: 'Đại Phá 29 Vạn Quân Thanh', 
+                                desc: 'Hoàng đế Quang Trung hành binh thần tốc từ Huế ra Bắc Hà, xông pha trận mạc hủy diệt hoàn toàn đại quân Thanh xâm lược đồn trú tại trận Ngọc Hồi - Đống Đa, khôi phục hòa bình cho Thăng Long vào đúng ngày mùng 5 Tết.' 
+                            }
+                        ]
+                    },
+                    {
+                        year: '1802 - 1858',
+                        name: 'Nhà Nguyễn Độc Lập',
+                        overview: 'Triều đại cai quản một cõi Việt Nam liền một dải thống nhất từ Lạng Sơn đến mũi Cà Mau, dập dồn các biến chuyển ngoại giao phương Tây kịch liệt.',
+                        events: [
+                            { 
+                                date: '1802', 
+                                title: 'Nguyễn Ánh Thống Nhất Giang Sơn', 
+                                desc: 'Nguyễn Ánh dẹp bỏ vương triều Tây Sơn sau biến cố suy sụp nội bộ, lên ngôi hoàng đế tôn hiệu Gia Long, đặt quốc hiệu Việt Nam, định đô tại Phú Xuân (Huế), thống nhất giang sơn đất nước.' 
+                            },
+                            { 
+                                date: '1820 - 1840', 
+                                title: 'Minh Mạng Đổi Mới Hành Chính - Hoàng Sa', 
+                                desc: 'Vua Minh Mạng tiến hành đợt cải cách đại quy mô phân chia Tổ quốc thống nhất thành 30 tỉnh và 1 phủ Thừa Thiên. Phái đoàn thủy quân hùng mạnh trực thuộc triều đình tiến hành cắm mốc dựng bia khẳng định chủ quyền tối cao của đất nước tại quần đảo Hoàng Sa và Trường Sa cứu tinh phong hải phong cương vững bền.' 
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'era-4',
+                title: 'Pháp Thuộc & Kháng Pháp',
+                desc: 'Đất nước rơi vào ách cai trị hà khắc và chia cắt của thực dân Pháp. Hàng trăm cuộc đấu tranh sôi sục mở đường cứu nước tìm ánh sáng cách mạng xã hội chủ nghĩa.',
+                icon: 'ph-hourglass',
+                tabs: [
+                    {
+                        year: '1858 - 1930',
+                        name: 'Xâm Lược & Kháng Pháp',
+                        overview: 'Thực dân Pháp nổ súng đánh úp bờ cõi, các phong trào Cần Vương, Đông Du dấy lên mạnh mẽ đấu tranh bảo toàn văn hiến quốc thổ.',
+                        events: [
+                            { 
+                                date: '1/9/1858', 
+                                title: 'Pháp Nổ Súng Xâm Lược Đà Nẵng', 
+                                desc: 'Liên quân Pháp - Tây Ban Nha khai hỏa tấn công cửa biển Đà Nẵng, mở màn quá trình xâm lược tàn bạo của chủ nghĩa thực dân thực dân Pháp vào nước ta.' 
+                            },
+                            { 
+                                date: '1885 - 1896', 
+                                title: 'Bùng Nổ Phong Trào Cần Vương', 
+                                desc: 'Tôn Thất Thuyết đưa vua trẻ Hàm Nghi lánh nạn ra mật khu Quảng Trị ban hịch Cần Vương tập hợp nghĩa sĩ cứu quốc kháng chiến Pháp hào sảng oanh liệt khắp vùng Trung - Bắc Bộ, dấy lên loạt nghĩa binh Hương Khê, Ba Đình, Bãi Sậy.' 
+                            },
+                            { 
+                                date: '5/6/1911', 
+                                title: 'Nguyễn Tất Thành Tìm Đường Cứu Nước', 
+                                desc: 'Người thanh niên yêu nước xuất chúng Nguyễn Tất Thành xuống tàu Amiral Latouche-Tréville rời cảng Nhà Rồng sang phương Tây tìm lối đi giải phóng dân tộc đích thực khỏi bàn tay xiềng xích thực dân.' 
+                            }
+                        ]
+                    },
+                    {
+                        year: '1930 - 1945',
+                        name: 'Đảng Ra Đời & CMT8',
+                        overview: 'Đảng Cộng sản thống nhất dẫn lối chỉ đường cứu nước, nắm bắt vận mệnh thời cơ lật nhào xiềng xích Nhật - Pháp lập nước mới.',
+                        events: [
+                            { 
+                                date: '3/2/1930', 
+                                title: 'Thành Lập Đảng Cộng Sản Việt Nam', 
+                                desc: 'Lãnh tụ Nguyễn Ái Quốc chủ trì hội nghị hợp nhất các tổ chức cộng sản tại Cửu Long (Hương Cảng, Trung Quốc), khai sinh chính đảng duy nhất thống nhất chèo lái cách mạng.' 
+                            },
+                            { 
+                                date: '19/8/1945', 
+                                title: 'Bùng Nổ Cách Mạng Tháng Tám', 
+                                desc: 'Dưới thời cơ Nhật đầu hàng đồng minh, nhân dân cả nước vùng lên Tổng khởi nghĩa cướp chính quyền. Chiều ngày 30/8/1945 vua Bảo Đại chính thức trao ấn kiếm chấm dứt tuyệt đối chế độ quân chủ.' 
+                            },
+                            { 
+                                date: '2/9/1945', 
+                                title: 'Khai Sinh Nước Việt Nam Dân Chủ Cộng Hòa', 
+                                desc: 'Tại Quảng trường Ba Đình rực rỡ nắng vàng, Chủ tịch Hồ Chí Minh long trọng đọc Tuyên ngôn Độc lập, khai sinh nước Việt Nam Dân chủ Cộng hòa - Nhà nước công nông đầu tiên ở Đông Nam Á.' 
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'era-5',
+                title: 'Kháng Chiến Giải Phóng',
+                desc: 'Chương sử oai hùng trường kỳ kéo dài 30 năm chiến đấu chống lại hai đế quốc sừng sỏ nhất thế kỷ XX để thu giang sơn về một mối thống nhất độc lập.',
+                icon: 'ph-shield-checkered',
+                tabs: [
+                    {
+                        year: '1945 - 1954',
+                        name: 'Chống Thực Dân Pháp',
+                        overview: 'Chính quyền non trẻ đương đầu "thù trong giặc ngoài", thực hiện kháng chiến toàn dân, toàn diện, trường kỳ thắng lợi.',
+                        events: [
+                            { 
+                                date: '19/12/1946', 
+                                title: 'Toàn Quốc Kháng Chiến Bùng Nổ', 
+                                desc: 'Trước hành động leo thang lấn át tàn nhẫn của Pháp, Chủ tịch Hồ Chí Minh ra "Lời kêu gọi toàn quốc kháng chiến": "Chúng ta thà hy sinh tất cả, chứ nhất định không chịu mất nước...". Súng gầm vang trời bảo vệ Hà Nội.' 
+                            },
+                            { 
+                                date: '7/5/1954', 
+                                title: 'Đại Thắng Điện Biên Phủ Chấn Động Địa Cầu', 
+                                desc: 'Quân dân ta dưới sự tổng chỉ huy mưu trí của Đại tướng Võ Nguyên Giáp đại thắng hoàn toàn tập đoàn cứ điểm "bất khả chiến bại" Điện Biên Phủ của Pháp. Thắng lợi vang dội đặt nền móng giải phóng miền Bắc và ký Hiệp định Genève chấm dứt hiện diện Pháp.' 
+                            }
+                        ]
+                    },
+                    {
+                        year: '1954 - 1975',
+                        name: 'Chống Mỹ Cứu Nước',
+                        overview: 'Nửa nước miền Bắc dựng xây xã hội chủ nghĩa, miền Nam dũng mãnh dấy binh đập tan liên hoàn các chiến lược tàn khốc quân Mỹ.',
+                        events: [
+                            { 
+                                date: '1959 - 1960', 
+                                title: 'Phong Trào Đồng Khởi Bến Tre', 
+                                desc: 'Nhân dân miền Nam nổi dậy đồng khởi vũ trang diệt ác trừ gian phá kiềm từ Bến Tre lan rộng miền Tây Nam Bộ, thúc đẩy bệ phóng khai sinh Mặt trận Dân tộc Giải phóng miền Nam Việt Nam.' 
+                            },
+                            { 
+                                date: '12/1972', 
+                                title: 'Điện Biên Phủ Trên Không Phá B52', 
+                                desc: 'Quân dân Hà Nội - Hải Phòng giáng trả mưu đồ ném bom tàn bạo dã man bằng B52 phá hủy miền Bắc của Mỹ trong 12 ngày đêm khói lửa oanh liệt. Đập tan mưu đồ dọa nạt, buộc Tổng thống Mỹ ký Hiệp định Paris (1973) rút quân sạch khỏi Việt Nam.' 
+                            },
+                            { 
+                                date: '30/4/1975', 
+                                title: 'Giải Phóng Miền Nam - Thống Nhất Tổ Quốc', 
+                                desc: 'Chiến dịch Hồ Chí Minh lịch sử đạt toàn thắng. Xe tăng húc đổ cổng Dinh Độc Lập hồi 11h30 phút, giương cao cờ giải phóng bay phấp phới. Hoàn thành tuyệt đối sự nghiệp thống nhất non sông Nam Bắc sum họp một nhà.' 
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'era-6',
+                title: 'Việt Nam Đương Đại',
+                desc: 'Hành trình vượt qua bao gian nan cô lập hậu chiến tranh, kiên cường giữ gìn bờ cõi biển đảo bờ cõi Tổ quốc và mở cửa Đổi Mới phát triển phồn vinh trên trường thế giới.',
+                icon: 'ph-globe-hemisphere-east',
+                tabs: [
+                    {
+                        year: '1975 - 1986',
+                        name: 'Bảo Vệ Tổ Quốc',
+                        overview: 'Vượt qua giai đoạn bao vây cô lập cấm vận đầy thử thách, khôi phục vết thương hậu chiến tranh và bảo vệ vững chắc biên giới Tổ quốc.',
+                        events: [
+                            { 
+                                date: '1979', 
+                                title: 'Kháng Chiến Biên Giới Tây Nam & Phía Bắc', 
+                                desc: 'Quân dân ta anh dũng tiến hành chiến tranh tự vệ dẹp tan bè lũ xâm phạm chủ quyền Pol Pot ở biên giới Tây Nam cứu nhân dân Campuchia thoát nạn diệt chủng, đồng thời bẻ gãy đạo quân bành trướng tràn qua biên giới phía Bắc ở 6 tỉnh biên cương.' 
+                            },
+                            { 
+                                date: '14/3/1988', 
+                                title: 'Hải Chiến Gạc Ma Kiên Dũng', 
+                                desc: 'Trận chiến can trường đẫm máu bảo vệ chủ quyền tại bãi đá Gạc Ma thuộc quần đảo Trường Sa. 64 chiến sĩ dũng cảm đã tay nắm tay kết thành "vòng tròn bất tử" giữ vững lá cờ đỏ sao vàng vinh quang giữa lòng biển khơi.' 
+                            }
+                        ]
+                    },
+                    {
+                        year: '1986 - Nay',
+                        name: 'Thời Kỳ Đổi Mới & Hội Nhập',
+                        overview: 'Xóa bỏ quan liêu bao cấp lỗi thời, mở lối phát triển nền kinh tế thị trường, nâng tầm ngoại giao vượt bậc.',
+                        events: [
+                            { 
+                                date: '12/1986', 
+                                title: 'Đại Hội VI Đề Xướng "Đổi Mới"', 
+                                desc: 'Bước ngoặt mang tính sinh tử lịch sử cứu nước. Đảng Cộng sản chính thức xóa bỏ cơ chế bao cấp bao trùm, mở đường nền kinh tế thị trường định hướng xã hội chủ nghĩa, giúp hồi sinh ngoạn mục vị thế kinh tế quốc gia.' 
+                            },
+                            { 
+                                date: '1995', 
+                                title: 'Gia Nhập ASEAN & Bình Thường Hóa Với Mỹ', 
+                                desc: 'Phá vỡ hoàn toàn thế bị bao vây cô lập ngoại giao bấy lâu. Việt Nam chính thức thiết lập quan hệ hữu nghị bình thường hóa với Hoa Kỳ đồng thời hội nhập gia nhập ngôi nhà chung Đông Nam Á ASEAN.' 
+                            },
+                            { 
+                                date: 'Hôm Nay', 
+                                title: 'Việt Nam Chuyển Mình Số Hóa Toàn Cầu', 
+                                desc: 'Xây dựng vị thế quốc tế kiên định thông qua đường lối ngoại giao "Tre Việt Nam" kiên định dẻo dai. Việt Nam vươn lên trở thành một trong các trung tâm kinh tế năng động tăng trưởng cao nhất châu Á, đẩy nhanh công cuộc số hóa đất nước.' 
+                            }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        // --- STATE MANAGEMENT ---
+        let currentEraIndex = 0;
+        let currentTabIndex = 0;
+        let quizScore = 0;
+        let quizState = null; // { question: string, options: string[], correct: string, explanation: string, answered: boolean }
+
+        // --- DOM ELEMENTS ---
+        const sidebarNav = document.getElementById('sidebar-nav');
+        const pageTitle = document.getElementById('page-title');
+        const pageDesc = document.getElementById('page-desc');
+        const tabsContainer = document.getElementById('tabs-container');
+        const canvasBoard = document.getElementById('canvas-board');
+        const searchInput = document.getElementById('search-input');
+
+        // Stats elements
+        const statTabsCount = document.getElementById('stat-tabs-count');
+        const statEventsCount = document.getElementById('stat-events-count');
+
+        // Modal Elements
+        const detailModal = document.getElementById('detail-modal');
+        const modalDate = document.getElementById('modal-date');
+        const modalTitle = document.getElementById('modal-title');
+        const modalDesc = document.getElementById('modal-desc');
+        const modalTtsBtn = document.getElementById('modal-tts-btn');
+
+        // --- FUNCTIONS ---
+
+        function updateStats() {
+            const era = historyData[currentEraIndex];
+            statTabsCount.innerText = era.tabs.length;
+            
+            let totalEvents = 0;
+            era.tabs.forEach(tab => {
+                totalEvents += tab.events.length;
+            });
+            statEventsCount.innerText = totalEvents;
+        }
+
+        function renderSidebar(filteredData = historyData) {
+            sidebarNav.innerHTML = '';
+            
+            if (filteredData.length === 0) {
+                sidebarNav.innerHTML = `
+                    <div class="text-center p-6 text-slate-500 text-sm">
+                        <i class="ph ph-magnifying-glass text-3xl mb-2 block mx-auto text-slate-600"></i>
+                        Không tìm thấy sự kiện nào trùng khớp.
+                    </div>
+                `;
+                return;
+            }
+
+            filteredData.forEach((era) => {
+                // Find original index in master historyData array
+                const originalIndex = historyData.findIndex(h => h.id === era.id);
+                const isActive = originalIndex === currentEraIndex;
+
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left px-4 py-3.5 rounded-xl transition-all duration-300 flex items-center gap-3.5 ${isActive ? 'bg-primary/10 text-primary border border-primary/30 shadow-[0_4px_20px_rgba(234,179,8,0.08)]' : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200 border border-transparent'}`;
+                btn.innerHTML = `
+                    <div class="p-2 rounded-lg ${isActive ? 'bg-primary/20 text-primary' : 'bg-slate-900 text-slate-500'}">
+                        <i class="ph ${era.icon} text-lg"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-medium text-sm truncate ${isActive ? 'text-white font-semibold' : 'text-slate-300'}">${era.title}</p>
+                        <p class="text-[10px] text-slate-500 truncate mt-0.5">${era.tabs.length} Triều đại / Phân kỳ</p>
+                    </div>
+                `;
+                btn.onclick = () => {
+                    if (currentEraIndex !== originalIndex) {
+                        currentEraIndex = originalIndex;
+                        currentTabIndex = 0; // Reset tab on era change
+                        updateUI();
+                    }
+                };
+                sidebarNav.appendChild(btn);
+            });
+        }
+
+        function renderTabs() {
+            tabsContainer.innerHTML = '';
+            const era = historyData[currentEraIndex];
+            
+            era.tabs.forEach((tab, index) => {
+                const isActive = index === currentTabIndex;
+                const tabDiv = document.createElement('button');
+                tabDiv.className = `shrink-0 text-left cursor-pointer group relative pb-3 px-1 transition-all focus:outline-none ${isActive ? 'opacity-100' : 'opacity-50 hover:opacity-100'}`;
+                
+                tabDiv.innerHTML = `
+                    <div class="text-[10px] font-bold tracking-widest uppercase mb-1 ${isActive ? 'text-primary' : 'text-slate-500 group-hover:text-slate-400'}">${tab.year}</div>
+                    <div class="text-base font-serif font-semibold ${isActive ? 'text-white' : 'text-slate-300'}">${tab.name}</div>
+                    <!-- Active Indicator line -->
+                    <div class="absolute bottom-0 left-0 w-full h-[3px] rounded-t-full transition-all duration-300 ${isActive ? 'bg-gradient-to-r from-primary to-accent' : 'bg-transparent'}"></div>
+                `;
+                
+                tabDiv.onclick = () => {
+                    if (currentTabIndex !== index) {
+                        currentTabIndex = index;
+                        quizState = null; // reset quiz state when changing tab
+                        renderCanvas();
+                        renderTabs(); // Re-render to update active styling
+                    }
+                };
+                tabsContainer.appendChild(tabDiv);
+            });
+        }
+
+        function generateQuiz() {
+            const era = historyData[currentEraIndex];
+            const tab = era.tabs[currentTabIndex];
+            
+            if (!tab || tab.events.length < 2) {
+                return null; // Need at least 2 events to construct a question with distractors
+            }
+
+            // Pick a random event from current tab
+            const eventIndex = Math.floor(Math.random() * tab.events.length);
+            const targetEvent = tab.events[eventIndex];
+
+            // Decide question type: 0 = "What event happened in Year?", 1 = "When did Event occur?"
+            const qType = Math.floor(Math.random() * 2);
+            let question = "";
+            let correct = "";
+            let explanation = targetEvent.desc;
+            let options = [];
+
+            if (qType === 0) {
+                question = `Sự kiện lịch sử hào hùng nào diễn ra vào mốc thời gian: <span class="text-primary font-bold font-serif">${targetEvent.date}</span>?`;
+                correct = targetEvent.title;
+                
+                options.push(correct);
+                // Grab distractors from other events in the same era or others
+                let allEraEvents = [];
+                era.tabs.forEach(t => {
+                    t.events.forEach(ev => {
+                        if (ev.title !== correct) allEraEvents.push(ev.title);
+                    });
+                });
+
+                // Shuffle and pick 2 distractors
+                allEraEvents = allEraEvents.sort(() => 0.5 - Math.random());
+                options.push(...allEraEvents.slice(0, 2));
+            } else {
+                question = `Mốc lịch sử <span class="text-primary font-bold font-serif">"${targetEvent.title}"</span> đã diễn ra vào năm/giai đoạn nào?`;
+                correct = targetEvent.date;
+
+                options.push(correct);
+                let allEraDates = [];
+                era.tabs.forEach(t => {
+                    t.events.forEach(ev => {
+                        if (ev.date !== correct) allEraDates.push(ev.date);
+                    });
+                });
+
+                allEraDates = allEraDates.sort(() => 0.5 - Math.random());
+                options.push(...allEraDates.slice(0, 2));
+            }
+
+            // Shuffle the options so correct answer isn't always first
+            options = options.sort(() => 0.5 - Math.random());
+
+            return {
+                question,
+                options,
+                correct,
+                explanation,
+                answered: false,
+                selectedAnswer: null
+            };
+        }
+
+        function selectQuizAnswer(option) {
+            if (quizState.answered) return;
+
+            quizState.answered = true;
+            quizState.selectedAnswer = option;
+
+            const isCorrect = option === quizState.correct;
+            if (isCorrect) {
+                quizScore++;
+            }
+
+            // Render updated quiz container inside the board immediately
+            renderQuizCard();
+        }
+
+        function renderQuizCard() {
+            const quizContainer = document.getElementById('quiz-widget');
+            if (!quizContainer || !quizState) return;
+
+            let optionsHtml = '';
+            quizState.options.forEach(opt => {
+                let btnStyle = 'border-slate-800 bg-slate-900/60 hover:bg-slate-900 hover:border-slate-700 text-slate-300';
+                let iconHtml = '';
+
+                if (quizState.answered) {
+                    if (opt === quizState.correct) {
+                        btnStyle = 'border-emerald-500/50 bg-emerald-500/10 text-emerald-300';
+                        iconHtml = '<i class="ph ph-check-circle text-xl text-emerald-400 shrink-0"></i>';
+                    } else if (opt === quizState.selectedAnswer) {
+                        btnStyle = 'border-rose-500/50 bg-rose-500/10 text-rose-300';
+                        iconHtml = '<i class="ph ph-x-circle text-xl text-rose-400 shrink-0"></i>';
+                    } else {
+                        btnStyle = 'border-slate-800/40 bg-slate-900/20 text-slate-500 cursor-not-allowed';
+                    }
+                }
+
+                optionsHtml += `
+                    <button onclick="selectQuizAnswer('${opt.replace(/'/g, "\\'")}')" 
+                            ${quizState.answered ? 'disabled' : ''}
+                            class="w-full text-left p-4 rounded-xl border transition-all flex items-center justify-between gap-3 text-sm font-medium ${btnStyle}">
+                        <span>${opt}</span>
+                        ${iconHtml}
+                    </button>
+                `;
+            });
+
+            let feedbackHtml = '';
+            if (quizState.answered) {
+                const isCorrect = quizState.selectedAnswer === quizState.correct;
+                feedbackHtml = `
+                    <div class="mt-6 p-4 rounded-xl ${isCorrect ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-rose-500/10 border border-rose-500/20'} fade-in">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i class="ph ${isCorrect ? 'ph-sparkle text-emerald-400' : 'ph-info text-rose-400'} text-xl"></i>
+                            <h4 class="font-bold text-sm text-white">${isCorrect ? 'Tuyệt vời! Câu trả lời chính xác.' : 'Chưa đúng rồi! Hãy cùng ôn lại lịch sử.'}</h4>
+                        </div>
+                        <p class="text-xs text-slate-400 leading-relaxed">${quizState.explanation}</p>
+                    </div>
+                `;
+            }
+
+            quizContainer.innerHTML = `
+                <div class="flex items-center justify-between border-b border-slate-800/60 pb-3 mb-4">
+                    <h4 class="text-sm font-serif text-slate-300 font-bold flex items-center gap-2">
+                        <i class="ph ph-exam text-primary text-lg"></i> Trắc Nghiệm Sử Ký Nhanh
+                    </h4>
+                    <span class="text-xs bg-slate-800 px-2.5 py-1 rounded-md text-slate-400 font-semibold">Điểm: ${quizScore}</span>
+                </div>
+                
+                <p class="text-slate-200 text-sm mb-4 font-medium leading-relaxed">${quizState.question}</p>
+                
+                <div class="space-y-3">
+                    ${optionsHtml}
+                </div>
+                
+                ${feedbackHtml}
+                
+                ${quizState.answered ? `
+                    <button onclick="reloadQuiz()" class="mt-4 w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white rounded-lg transition-all flex items-center justify-center gap-1.5">
+                        <i class="ph ph-arrows-counter-clockwise text-base"></i> Làm Câu Hỏi Khác
+                    </button>
+                ` : ''}
+            `;
+        }
+
+        function reloadQuiz() {
+            quizState = generateQuiz();
+            renderQuizCard();
+        }
+
+        function renderCanvas() {
+            const era = historyData[currentEraIndex];
+            const tab = era.tabs[currentTabIndex];
+
+            // Trigger smooth re-animation of the board content
+            canvasBoard.classList.remove('fade-in');
+            void canvasBoard.offsetWidth; 
+            canvasBoard.classList.add('fade-in');
+
+            // Generate Quiz State for this current tab
+            if (!quizState) {
+                quizState = generateQuiz();
+            }
+
+            let html = `
+                <div class="max-w-4xl mx-auto space-y-10">
+                    <!-- Overview Card -->
+                    <div class="glass-panel p-6 md:p-8 rounded-3xl border-l-4 border-l-primary shadow-xl shadow-black/40 relative overflow-hidden">
+                        <div class="absolute -right-12 -top-12 opacity-5 pointer-events-none">
+                            <i class="ph ph-scroll text-[160px] text-primary"></i>
+                        </div>
+                        <h3 class="text-lg md:text-xl font-serif text-white mb-3 flex items-center gap-2.5">
+                            <i class="ph ph-map-trifold text-primary text-2xl"></i> Sơ đồ Tổng quan Triều Đại
+                        </h3>
+                        <p class="text-slate-300 text-base md:text-lg leading-relaxed font-serif italic">${tab.overview}</p>
+                    </div>
+
+                    <!-- Timeline Events -->
+                    <div class="relative timeline-line pl-12 space-y-10 pb-8">
+            `;
+
+            tab.events.forEach((event, idx) => {
+                html += `
+                    <div class="relative group cursor-pointer" onclick="openModal(${idx})">
+                        <!-- Node Point with golden aura glow -->
+                        <div class="absolute -left-12 top-2 w-6 h-6 rounded-full bg-dark border-[4px] border-primary z-10 shadow-[0_0_12px_rgba(234,179,8,0.5)] group-hover:scale-125 group-hover:border-accent transition-all duration-300"></div>
+                        
+                        <!-- Event Content Box -->
+                        <div class="glass-panel p-6 rounded-2xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-primary/5 border border-slate-800/80 hover:border-primary/40">
+                            <div class="flex items-center justify-between gap-4 mb-3">
+                                <span class="inline-block px-3 py-1 bg-gradient-to-r from-primary/20 to-accent/20 text-primary text-xs font-bold rounded-lg border border-primary/20">
+                                    ${event.date}
+                                </span>
+                                <div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 text-xs text-primary font-semibold">
+                                    Tìm hiểu thêm <i class="ph ph-arrow-right text-sm"></i>
+                                </div>
+                            </div>
+                            <h4 class="text-xl md:text-2xl font-serif text-white mb-2 group-hover:text-primary transition-colors">${event.title}</h4>
+                            <p class="text-slate-400 text-sm leading-relaxed truncate-3-lines">${event.desc}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+
+                    <!-- Quiz Block -->
+                    ${quizState ? `
+                        <div id="quiz-widget" class="glass-panel p-6 rounded-3xl border border-slate-800 shadow-xl bg-gradient-to-b from-slate-900/40 to-slate-950/40">
+                            <!-- Quiz content will be injected by renderQuizCard -->
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            canvasBoard.innerHTML = html;
+            renderQuizCard();
+        }
+
+        function handleSearch() {
+            const query = searchInput.value.toLowerCase().trim();
+            if (query === '') {
+                renderSidebar(historyData);
+                return;
+            }
+
+            // Filter eras where either the title matches, or any of their tabs' events match
+            const filtered = historyData.filter(era => {
+                const eraMatch = era.title.toLowerCase().includes(query) || era.desc.toLowerCase().includes(query);
+                const eventsMatch = era.tabs.some(tab => {
+                    return tab.name.toLowerCase().includes(query) || tab.events.some(ev => {
+                        return ev.title.toLowerCase().includes(query) || ev.desc.toLowerCase().includes(query) || ev.date.toLowerCase().includes(query);
+                    });
+                });
+                return eraMatch || eventsMatch;
+            });
+
+            renderSidebar(filtered);
+        }
+
+        let currentUtterance = null;
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                // Cancel previous speech
+                window.speechSynthesis.cancel();
+
+                currentUtterance = new SpeechSynthesisUtterance(text);
+                
+                // Try to find a Vietnamese voice
+                const voices = window.speechSynthesis.getVoices();
+                const viVoice = voices.find(voice => voice.lang.includes('vi') || voice.lang.includes('VI'));
+                if (viVoice) {
+                    currentUtterance.voice = viVoice;
+                }
+                
+                currentUtterance.rate = 0.95; // Slightly slower for better comprehension
+                window.speechSynthesis.speak(currentUtterance);
+            } else {
+                alert("Rất tiếc, trình duyệt của bạn không hỗ trợ tính năng chuyển văn bản thành giọng nói (TTS).");
+            }
+        }
+
+        function openModal(eventIdx) {
+            const era = historyData[currentEraIndex];
+            const tab = era.tabs[currentTabIndex];
+            const event = tab.events[eventIdx];
+
+            modalDate.innerText = event.date;
+            modalTitle.innerText = event.title;
+            modalDesc.innerHTML = `
+                <div class="space-y-4">
+                    <p class="text-lg font-serif italic text-slate-200 border-l-2 border-primary pl-4 py-1">${event.desc}</p>
+                    <p class="text-xs text-slate-500 uppercase font-semibold tracking-wider pt-4 border-t border-slate-800">Thông tin bối cảnh</p>
+                    <p class="text-sm text-slate-400">Sự kiện này thuộc phân kỳ lịch sử <strong class="text-slate-300">${tab.name} (${tab.year})</strong> thuộc vương triều/kỷ nguyên vĩ mô <strong class="text-slate-300">${era.title}</strong> của Lịch sử Việt Nam.</p>
+                </div>
+            `;
+            
+            // Wire TTS buttons
+            modalTtsBtn.onclick = () => {
+                const fullTextToRead = `${event.title}. Mốc thời gian ${event.date}. ${event.desc}`;
+                speakText(fullTextToRead);
+            };
+
+            detailModal.classList.remove('hidden');
+            detailModal.classList.add('fade-in');
+        }
+
+        function closeModal() {
+            detailModal.classList.add('hidden');
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Stop talking on modal close
+            }
+        }
+
+        function updateUI() {
+            const era = historyData[currentEraIndex];
+            pageTitle.innerText = era.title;
+            pageDesc.innerText = era.desc;
+            
+            updateStats();
+            renderSidebar();
+            renderTabs();
+            renderCanvas();
+        }
+
+        // Initialize App
+        window.onload = () => {
+            updateUI();
+            
+            // Web Speech API needs a voice reload trigger on some browsers
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.getVoices();
+            }
+        };
+
+        // Close modal on escape press or click outside
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+        detailModal.addEventListener('click', (e) => {
+            if (e.target === detailModal) closeModal();
+        });
+
+    </script>
+</body>
+</html>
